@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roblox Asset Downloader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: #ffffff;
+      --foreground: #09090b;
+      --card: #ffffff;
+      --card-foreground: #09090b;
+      --popover: #ffffff;
+      --popover-foreground: #09090b;
+      --primary: #18181b;
+      --primary-foreground: #ffffff;
+      --secondary: #f4f4f5;
+      --secondary-foreground: #18181b;
+      --muted: #f4f4f5;
+      --muted-foreground: #71717a;
+      --accent: #f4f4f5;
+      --accent-foreground: #18181b;
+      --destructive: #ef4444;
+      --destructive-foreground: #ffffff;
+      --border: #e4e4e7;
+      --input: #e4e4e7;
+      --ring: #18181b;
+      --radius: 0.5rem;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--foreground);
+      background-color: var(--background);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 800px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    h1 {
+      color: var(--foreground);
+      font-weight: 700;
+      font-size: 2rem;
+      letter-spacing: -0.025em;
+      margin-bottom: 2rem;
+    }
+    
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    
+    p {
+      margin-bottom: 1rem;
+      color: var(--muted-foreground);
+    }
+    
+    small {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+    }
+    
+    .form-container {
+      background-color: var(--card);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+      border: 1px solid var(--border);
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+    input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--input);
+      background-color: transparent;
+      font-size: 0.875rem;
+      color: var(--foreground);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+    
+    input:focus {
+      border-color: var(--ring);
+      box-shadow: 0 0 0 1px var(--ring);
+    }
+    
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius);
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+      cursor: pointer;
+      outline: none;
+      border: 1px solid transparent;
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+    
+    button:hover {
+      background-color: var(--foreground);
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .status {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: var(--radius);
+      width: 100%;
+      display: none;
+      font-size: 0.875rem;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .status.success {
+      background-color: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      display: block;
+    }
+    
+    .status.error {
+      background-color: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      display: block;
+    }
+    
+    .status.info {
+      background-color: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+      display: block;
+    }
+    
+        .history-container {      width: 100%;      max-width: 600px;      background-color: var(--card);      padding: 1.5rem;      border-radius: var(--radius);      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);      border: 1px solid var(--border);    }        .history-title {      font-size: 1rem;      font-weight: 600;      margin-bottom: 1rem;      color: var(--foreground);    }        .history-list {      list-style: none;      padding: 0;      margin: 0;      max-height: 200px;      overflow-y: auto;    }        .history-item {      padding: 0.75rem 0;      border-bottom: 1px solid var(--border);      display: flex;      justify-content: space-between;      align-items: center;      font-size: 0.875rem;    }
+    
+        .spinner {      border: 3px solid rgba(0, 0, 0, 0.05);      width: 20px;      height: 20px;      border-radius: 50%;      border-top-color: var(--foreground);      animation: spin 0.8s linear infinite;      display: none;      margin-right: 12px;    }        @keyframes spin {      0% { transform: rotate(0deg); }      100% { transform: rotate(360deg); }    }        .loading {      display: flex;      align-items: center;      font-size: 0.875rem;      color: var(--muted-foreground);      padding: 0.75rem;      border-radius: var(--radius);      background-color: var(--muted);      border: 1px solid var(--border);    }        .loading .spinner {      display: inline-block;    }
+    
+        .tabs {      display: flex;      width: 100%;      max-width: 600px;      margin-bottom: 0;      padding: 0 0.25rem;      border-bottom: 1px solid var(--border);    }        .tab {      padding: 0.75rem 1rem;      background-color: transparent;      cursor: pointer;      font-size: 0.875rem;      font-weight: 500;      color: var(--muted-foreground);      border-bottom: 2px solid transparent;      transition: all 0.15s;      margin-right: 0.75rem;    }        .tab:hover {      color: var(--foreground);    }        .tab.active {      color: var(--foreground);      font-weight: 600;      border-bottom: 2px solid var(--foreground);    }
+    
+    .tab-content {      display: none;      width: 100%;      margin-top: 1rem;    }        .tab-content.active {      display: block;      animation: fadeIn 0.2s ease;    }
+    
+        .auth-status {      display: flex;      align-items: center;      padding: 0.75rem;      border-radius: var(--radius);      margin-bottom: 1rem;      background-color: var(--muted);      border: 1px solid var(--border);      width: 100%;    }        .auth-status .status-dot {      width: 8px;      height: 8px;      border-radius: 50%;      margin-right: 0.75rem;      transition: background-color 0.2s;    }        .auth-status .status-dot.authenticated {      background-color: #10b981;    }        .auth-status .status-dot.unauthenticated {      background-color: #ef4444;    }        .divider {      width: 100%;      border-top: 1px solid var(--border);      margin: 1rem 0;    }        .cookie-input {      width: 100%;      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;      font-size: 0.875rem;    }        /* Loading overlay styles */    .loading-overlay {      position: fixed;      top: 0;      left: 0;      width: 100%;      height: 100%;      background-color: rgba(255, 255, 255, 0.97);      backdrop-filter: blur(4px);      display: flex;      flex-direction: column;      justify-content: center;      align-items: center;      z-index: 9999;      transition: opacity 0.3s ease-out;    }        .loading-overlay.hidden {      opacity: 0;      pointer-events: none;    }        .loading-spinner {      border: 4px solid rgba(24, 24, 27, 0.1);      border-top: 4px solid var(--foreground);      border-radius: 50%;      width: 40px;      height: 40px;      animation: spin 1s linear infinite;      margin-bottom: 20px;    }        .loading-message {      font-size: 1.25rem;      font-weight: 600;      color: var(--foreground);      margin-top: 1rem;      margin-bottom: 0.5rem;    }        .loading-status {      font-size: 0.875rem;      color: var(--muted-foreground);      margin-top: 0.5rem;      text-align: center;      max-width: 80%;    }
+    
+        /* Image preview styles */    .image-preview-container {      width: 100%;      max-width: 600px;      background-color: var(--card);      padding: 1.5rem;      border-radius: var(--radius);      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);      margin-bottom: 1.5rem;      margin-top: 1.5rem;      display: none;      border: 1px solid var(--border);      animation: fadeIn 0.3s ease;    }        .image-preview-header {      display: flex;      justify-content: space-between;      align-items: center;      margin-bottom: 1rem;      width: 100%;    }        .close-preview-btn {      background: none;      border: none;      color: var(--muted-foreground);      font-size: 1.25rem;      cursor: pointer;      border-radius: var(--radius);      width: 28px;      height: 28px;      display: inline-flex;      align-items: center;      justify-content: center;      transition: all 0.15s;    }        .close-preview-btn:hover {      color: var(--destructive);      background-color: var(--muted);    }        .image-preview {      width: 100%;      max-height: 400px;      object-fit: contain;      margin-bottom: 1.25rem;      border-radius: var(--radius);      border: 1px solid var(--border);      background-color: var(--muted);      padding: 0.5rem;    }        .image-buttons {      display: flex;      gap: 1rem;      justify-content: center;      width: 100%;    }        .copy-btn {      background-color: var(--secondary);      color: var(--secondary-foreground);    }        .copy-btn:hover {      background-color: var(--muted);    }        .download-btn {      background-color: var(--primary);      color: var(--primary-foreground);    }        .download-btn:hover {      background-color: var(--foreground);    }
+    
+        /* Pop-up notification styles */    .toast-container {      position: fixed;      bottom: 20px;      right: 20px;      z-index: 9999;      display: flex;      flex-direction: column;      gap: 8px;      max-width: 380px;    }        .toast {      background-color: var(--card);      color: var(--card-foreground);      padding: 12px 16px;      border-radius: var(--radius);      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);      display: flex;      align-items: center;      animation: slideUp 0.2s ease, fadeOut 0.2s 3s forwards;      overflow: hidden;      border: 1px solid var(--border);    }        .toast.success {      border-left: 3px solid #10b981;    }        .toast.error {      border-left: 3px solid #ef4444;    }        .toast.info {      border-left: 3px solid #3b82f6;    }        .toast-icon {      margin-right: 12px;      font-size: 16px;      display: flex;      align-items: center;      justify-content: center;    }        .toast-content {      flex: 1;    }        .toast-message {      margin: 0;      font-size: 0.875rem;    }        @keyframes slideUp {      from { transform: translateY(20px); opacity: 0; }      to { transform: translateY(0); opacity: 1; }    }        @keyframes fadeOut {      from { opacity: 1; }      to { opacity: 0; }    }
+    
+        /* Debug panel styling */    .button-group {      display: flex;      gap: 0.5rem;      margin-bottom: 1rem;    }        .button-icon {      margin-right: 0.5rem;    }        button svg {      display: inline-block;      vertical-align: middle;    }        .debug-filters {      display: flex;      flex-wrap: wrap;      gap: 0.75rem;      margin-bottom: 1rem;    }        .debug-filters label {      display: flex;      align-items: center;      gap: 0.5rem;      font-size: 0.875rem;      color: var(--muted-foreground);      cursor: pointer;      user-select: none;    }        .debug-filters input[type="checkbox"] {      width: 16px;      height: 16px;      flex: none;      accent-color: var(--foreground);    }        .auth-debug {      margin-bottom: 1rem;      padding: 0.75rem;      background-color: var(--muted);      border: 1px solid var(--border);      border-radius: var(--radius);    }        .auth-debug h3 {      margin-bottom: 0.5rem;      font-size: 0.875rem;      font-weight: 600;    }        #auth-debug-output {      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;      font-size: 0.75rem;      white-space: pre-wrap;      color: var(--muted-foreground);    }        .debug-log-container {      max-height: 400px;      overflow-y: auto;      background-color: var(--muted);      border: 1px solid var(--border);      border-radius: var(--radius);      padding: 1rem;    }        #debugLogs {      margin: 0;      white-space: pre-wrap;      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;      font-size: 0.75rem;      line-height: 1.5;      color: var(--muted-foreground);    }        .log-entry {      margin-bottom: 0.5rem;      padding-bottom: 0.5rem;      border-bottom: 1px solid var(--border);    }
+  </style>
+</head>
+<body>
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-message">Loading application...</div>
+    <div class="loading-status" id="loadingStatus">Checking authentication status...</div>
+  </div>
+  
+  <!-- Toast notification container -->
+  <div class="toast-container" id="toastContainer"></div>
+  
+  <div class="container">
+    <h1>Roblox Asset Downloader</h1>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="download">Download</div>
+      <div class="tab" data-tab="auth">Authentication</div>
+      <div class="tab" data-tab="debug">Debug</div>
+    </div>
+    
+    <div class="form-container tab-content active" id="download-tab">
+      <div class="auth-status">
+        <div class="status-dot unauthenticated" id="status-dot"></div>
+        <span id="auth-status-text">Not authenticated</span>
+      </div>
+            <div class="input-group">        <input type="text" id="assetInput" placeholder="Enter Asset ID or URL (e.g., 1818, https://www.roblox.com/catalog/1818)">        <button id="downloadBtn">          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="button-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>          Download        </button>      </div>
+      <div id="status" class="status"></div>
+      <div id="loading" class="loading" style="display: none; margin-top: 1rem;">
+        <div class="spinner"></div>
+        <span>Downloading asset...</span>
+      </div>
+      <!-- Image Preview Container (inside download tab) -->
+      <div class="image-preview-container" id="imagePreviewContainer">
+        <div class="image-preview-header">
+          <h3>Image Preview</h3>
+          <button id="closePreviewBtn" class="close-preview-btn">&times;</button>
+        </div>
+        <img id="imagePreview" class="image-preview" alt="Asset preview" />
+        <div class="image-buttons">
+          <button id="copyImageBtn" class="copy-btn">Copy to Clipboard</button>
+          <button id="saveImageBtn" class="download-btn">Download Image</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-container tab-content" id="auth-tab">
+      <h2>Authentication</h2>
+      <p>Set your Roblox cookie to download assets that require authentication.</p>
+      
+      <div class="input-group">
+        <input type="text" id="cookieInput" class="cookie-input" placeholder="Enter your .ROBLOSECURITY cookie here">
+      </div>
+      
+      <p><small>To get your cookie: Log in to Roblox → Open developer tools (F12) → Go to Application tab → Cookies → www.roblox.com → Find .ROBLOSECURITY → Copy the value</small></p>
+      
+            <div class="button-group">        <button id="saveCookieBtn">          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="button-icon"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>          Save Cookie        </button>        <button id="clearCookieBtn">          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="button-icon"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>          Clear Cookie        </button>        <button id="checkAuthBtn">          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="button-icon"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>          Check Auth        </button>      </div>
+      
+      <div id="cookie-status" class="status"></div>
+    </div>
+    
+    <div class="form-container tab-content" id="debug-tab">
+      <h2>Debug Console</h2>
+      <p>View request and response details for debugging.</p>
+      
+            <div class="button-group">        <button id="refreshLogsBtn">          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="button-icon"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>          Refresh Logs        </button>        <button id="clearLogsBtn">          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="button-icon"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>          Clear Logs        </button>      </div>
+      
+            <div class="debug-filters">        <label><input type="checkbox" class="log-filter" value="API_REQUEST" checked> API Requests</label>        <label><input type="checkbox" class="log-filter" value="API_RESPONSE" checked> API Responses</label>        <label><input type="checkbox" class="log-filter" value="API_ERROR" checked> API Errors</label>        <label><input type="checkbox" class="log-filter" value="FILE_DOWNLOAD" checked> File Downloads</label>      </div>            <div class="auth-debug">        <h3>Authentication Debug</h3>        <div id="auth-debug-output"></div>      </div>            <div class="debug-log-container">        <pre id="debugLogs"></pre>      </div>
+    </div>
+    
+    <div class="history-container">
+      <div class="history-title">Download History</div>
+      <ul id="historyList" class="history-list"></ul>
+    </div>
+  </div>
+  
+  <script>
+    // DOM Elements
+    const assetInput = document.getElementById('assetInput');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusEl = document.getElementById('status');
+    const loadingEl = document.getElementById('loading');
+    const historyList = document.getElementById('historyList');
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const cookieInput = document.getElementById('cookieInput');
+    const saveCookieBtn = document.getElementById('saveCookieBtn');
+    const clearCookieBtn = document.getElementById('clearCookieBtn');
+    const checkAuthBtn = document.getElementById('checkAuthBtn');
+    const cookieStatusEl = document.getElementById('cookie-status');
+    const authStatusText = document.getElementById('auth-status-text');
+    const statusDot = document.getElementById('status-dot');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingStatus = document.getElementById('loadingStatus');
+    
+    // Image preview elements
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const copyImageBtn = document.getElementById('copyImageBtn');
+    const saveImageBtn = document.getElementById('saveImageBtn');
+    const closePreviewBtn = document.getElementById('closePreviewBtn');
+    const toastContainer = document.getElementById('toastContainer');
+    
+    // Current image data
+    let currentImageData = null;
+    let currentImageFileName = null;
+    
+    // Download history
+    let downloadHistory = JSON.parse(localStorage.getItem('downloadHistory') || '[]');
+    
+    // Function to hide loading overlay
+    function hideLoadingOverlay() {
+      loadingOverlay.classList.add('hidden');
+      setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+      }, 600); // Matches the CSS transition duration
+    }
+    
+    // Function to show loading overlay
+    function showLoadingOverlay(message, statusText) {
+      loadingOverlay.classList.remove('hidden');
+      loadingOverlay.style.display = 'flex';
+      
+      if (message) {
+        const messageElement = loadingOverlay.querySelector('.loading-message');
+        if (messageElement) messageElement.textContent = message;
+      }
+      
+      if (statusText) {
+        loadingStatus.textContent = statusText;
+      }
+    }
+    
+    // Tab switching
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Deactivate all tabs
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        // Activate clicked tab
+        tab.classList.add('active');
+        document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+      });
+    });
+    
+    // Check authentication status on startup
+    async function checkAuthStatus() {
+      try {
+        loadingStatus.textContent = "Requesting authentication status...";
+        const result = await window.api.getAuthStatus();
+        
+        if (result.authenticated) {
+          statusDot.classList.remove('unauthenticated');
+          statusDot.classList.add('authenticated');
+          authStatusText.textContent = `Authenticated as ${result.username}`;
+          loadingStatus.textContent = `Authenticated as ${result.username}`;
+        } else {
+          statusDot.classList.remove('authenticated');
+          statusDot.classList.add('unauthenticated');
+          authStatusText.textContent = 'Not authenticated';
+          loadingStatus.textContent = 'Not authenticated';
+          
+          if (result.error) {
+            console.error('Auth error:', result.error);
+            loadingStatus.textContent = `Authentication error: ${result.error}`;
+          }
+        }
+        
+        // Give users a moment to see the final auth status before hiding
+        setTimeout(() => {
+          // Hide loading overlay after auth status is determined
+          hideLoadingOverlay();
+        }, 100); // Changed from 1500ms to 500ms as requested
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        loadingStatus.textContent = `Error: ${error.message}`;
+        
+        // Still hide loading overlay even on error, but with a delay to show the error
+        setTimeout(() => {
+          hideLoadingOverlay();
+        }, 1500);
+      }
+    }
+    
+    // Initialize auth status when window is fully loaded
+    window.addEventListener('load', () => {
+      // Changed: Add a delay before attempting to check auth status
+      // This ensures IPC is ready and avoids timing issues
+      setTimeout(() => {
+        console.log('Checking auth status after window load');
+        // Replacing the direct check with a function that shows a loading message first
+        startAuthCheck();
+      }, 1000);
+    });
+    
+    // Added: Dedicated function to start auth check process
+    function startAuthCheck() {
+      // Make sure the loading overlay is visible
+      const messageElement = loadingOverlay.querySelector('.loading-message');
+      if (messageElement) messageElement.textContent = 'Initializing Application';
+      loadingStatus.textContent = 'Checking authentication status...';
+      
+      // Hide any fading animation that might be in progress
+      loadingOverlay.classList.remove('hidden');
+      loadingOverlay.style.display = 'flex';
+      
+      // Now check authentication after a small delay
+      // This ensures the loading screen animation is smoothly showing
+      setTimeout(() => {
+        checkAuthStatus();
+      }, 300);
+    }
+    
+    // Function to clean and format cookie
+    function formatCookie(rawCookie) {
+      // Trim whitespace
+      let cookie = rawCookie.trim();
+      
+      // Remove quotes if present
+      if ((cookie.startsWith('"') && cookie.endsWith('"')) || 
+          (cookie.startsWith("'") && cookie.endsWith("'"))) {
+        cookie = cookie.slice(1, -1);
+      }
+      
+      // If we see a common pattern from Chrome DevTools copy (like "Name=.ROBLOSECURITY; Value=_|WARNING...")
+      if (cookie.includes('Value=')) {
+        const match = cookie.match(/Value=([^;]+)/);
+        if (match && match[1]) {
+          cookie = match[1].trim();
+        }
+      }
+      
+      return cookie;
+    }
+    
+    // Handle cookie saving
+    saveCookieBtn.addEventListener('click', async () => {
+      let cookie = cookieInput.value.trim();
+      
+      if (!cookie) {
+        showCookieStatus('Please enter your .ROBLOSECURITY cookie', 'error');
+        return;
+      }
+      
+      // Format and clean the cookie
+      cookie = formatCookie(cookie);
+      
+      // Check if cookie starts with the expected warning text
+      if (!cookie.startsWith('_|WARNING:-DO-NOT-SHARE-THIS')) {
+        showCookieStatus('Cookie appears to be invalid. Make sure you\'re copying the entire value starting with "_|WARNING:-DO-NOT-SHARE-THIS..."', 'error');
+        return;
+      }
+      
+      try {
+        saveCookieBtn.disabled = true;
+        
+        const result = await window.api.setCookie(cookie);
+        
+        if (result.success && result.authenticated) {
+          showCookieStatus(`Successfully authenticated as ${result.username}`, 'success');
+          // Update authentication status display
+          await checkAuthStatus();
+        } else {
+          let errorMsg = 'Failed to authenticate with the provided cookie';
+          if (result.error) {
+            errorMsg += `: ${result.error}`;
+          }
+          if (result.debug) {
+            errorMsg += `\n\nDebug info: ${result.debug}`;
+          }
+          showCookieStatus(errorMsg, 'error');
+        }
+      } catch (error) {
+        showCookieStatus(`Error: ${error.message}`, 'error');
+      } finally {
+        saveCookieBtn.disabled = false;
+      }
+    });
+    
+    // Handle cookie clearing
+    clearCookieBtn.addEventListener('click', async () => {
+      try {
+        clearCookieBtn.disabled = true;
+        
+        await window.api.setCookie(null);
+        cookieInput.value = '';
+        
+        showCookieStatus('Cookie cleared successfully', 'info');
+        await checkAuthStatus();
+      } catch (error) {
+        showCookieStatus(`Error: ${error.message}`, 'error');
+      } finally {
+        clearCookieBtn.disabled = false;
+      }
+    });
+    
+    // Handle manual auth status check
+    checkAuthBtn.addEventListener('click', async () => {
+      try {
+        checkAuthBtn.disabled = true;
+        
+        // Show the loading overlay
+        showLoadingOverlay('Refreshing Authentication', 'Checking authentication status...');
+        
+        await checkAuthStatus();
+      } catch (error) {
+        // Display error in the cookie status area
+        showCookieStatus(`Error checking auth: ${error.message}`, 'error');
+        
+        // Hide loading overlay on error
+        hideLoadingOverlay();
+      } finally {
+        checkAuthBtn.disabled = false;
+      }
+    });
+    
+    // Render download history
+    function renderHistory() {
+      historyList.innerHTML = '';
+      
+      if (downloadHistory.length === 0) {
+        historyList.innerHTML = '<li class="history-item">No downloads yet</li>';
+        return;
+      }
+      
+      // Display most recent first
+      downloadHistory.slice().reverse().forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'history-item';
+        li.textContent = `${item.name} (Asset ID: ${item.assetId})`;
+        historyList.appendChild(li);
+      });
+    }
+    
+    // Initialize history
+    renderHistory();
+    
+    // Handle download button click
+    downloadBtn.addEventListener('click', async () => {
+      const input = assetInput.value.trim();
+      
+      if (!input) {
+        showStatus('Please enter an Asset ID or URL', 'error');
+        return;
+      }
+      
+      try {
+        // Show loading state
+        downloadBtn.disabled = true;
+        loadingEl.style.display = 'flex';
+        statusEl.style.display = 'none';
+        
+        // Hide any existing image preview
+        imagePreviewContainer.style.display = 'none';
+        
+        // Call the API to download the asset
+        const result = await window.api.downloadAsset(input);
+        
+        if (result.success) {
+          // Extract asset ID from input
+          const assetIdMatch = input.match(/(\d{3,100})/);
+          const assetId = assetIdMatch ? assetIdMatch[0] : 'unknown';
+          
+          if (result.isImage) {
+            // For images, show the preview
+            currentImageData = result.data;
+            currentImageFileName = result.fileName;
+            
+            // Display the image
+            imagePreview.src = `data:${result.contentType};base64,${result.data}`;
+            imagePreviewContainer.style.display = 'block';
+            
+            showStatus(`Image loaded successfully.`, 'success');
+          } else {
+            // For non-images, add to download history
+            downloadHistory.push({
+              name: result.assetName,
+              assetId,
+              path: result.filePath,
+              date: new Date().toISOString()
+            });
+            
+            // Limit history to last 10 items
+            if (downloadHistory.length > 10) {
+              downloadHistory = downloadHistory.slice(-10);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('downloadHistory', JSON.stringify(downloadHistory));
+            
+            // Update UI
+            renderHistory();
+            showStatus(`Asset downloaded successfully as ${result.assetName}`, 'success');
+          }
+        } else {
+          showStatus(`Error: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        showStatus(`Error: ${error.message || 'Unknown error'}`, 'error');
+      } finally {
+        // Reset UI state
+        downloadBtn.disabled = false;
+        loadingEl.style.display = 'none';
+        assetInput.focus();
+      }
+    });
+    
+    // Handle copy image button
+    copyImageBtn.addEventListener('click', async () => {
+      if (!currentImageData) {
+        showStatus('No image data available to copy', 'error');
+        showToast('No image data available to copy', 'error');
+        return;
+      }
+      
+      try {
+        // Show loading state
+        copyImageBtn.disabled = true;
+        showStatus('Copying image to clipboard...', 'info');
+        
+        // Copy image to clipboard
+        const result = await window.api.copyImageToClipboard(currentImageData);
+        
+        if (result.success) {
+          showStatus('Image copied to clipboard successfully', 'success');
+          showToast('Image copied to clipboard successfully', 'success');
+        } else {
+          showStatus(`Error copying to clipboard: ${result.error}`, 'error');
+          showToast(`Error copying to clipboard: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        showStatus(`Error: ${error.message || 'Unknown error'}`, 'error');
+        showToast(`Error: ${error.message || 'Unknown error'}`, 'error');
+      } finally {
+        // Reset UI state
+        copyImageBtn.disabled = false;
+      }
+    });
+    
+    // Handle save image button
+    saveImageBtn.addEventListener('click', async () => {
+      if (!currentImageData || !currentImageFileName) {
+        showStatus('No image data available to save', 'error');
+        showToast('No image data available to save', 'error');
+        return;
+      }
+      
+      try {
+        // Show loading state
+        saveImageBtn.disabled = true;
+        showStatus('Saving image...', 'info');
+        
+        // Save image to file
+        const result = await window.api.saveImage({
+          fileName: currentImageFileName,
+          data: currentImageData
+        });
+        
+        if (result.success) {
+          // Add to download history
+          const assetIdMatch = currentImageFileName.match(/(\d{3,100})/);
+          const assetId = assetIdMatch ? assetIdMatch[0] : 'unknown';
+          
+          downloadHistory.push({
+            name: result.assetName,
+            assetId,
+            path: result.filePath,
+            date: new Date().toISOString()
+          });
+          
+          // Limit history to last 10 items
+          if (downloadHistory.length > 10) {
+            downloadHistory = downloadHistory.slice(-10);
+          }
+          
+          // Save to localStorage
+          localStorage.setItem('downloadHistory', JSON.stringify(downloadHistory));
+          
+          // Update UI
+          renderHistory();
+          showStatus(`Image saved successfully as ${result.assetName}`, 'success');
+          showToast(`Image saved successfully as ${result.assetName}`, 'success');
+        } else {
+          showStatus(`Error saving image: ${result.error}`, 'error');
+          showToast(`Error saving image: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        showStatus(`Error: ${error.message || 'Unknown error'}`, 'error');
+        showToast(`Error: ${error.message || 'Unknown error'}`, 'error');
+      } finally {
+        // Reset UI state
+        saveImageBtn.disabled = false;
+      }
+    });
+    
+    // Show status message for downloads
+    function showStatus(message, type) {
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+      statusEl.style.display = 'block';
+    }
+    
+    // Show status message for cookie operations
+    function showCookieStatus(message, type) {
+      cookieStatusEl.textContent = message;
+      cookieStatusEl.className = `status ${type}`;
+      cookieStatusEl.style.display = 'block';
+    }
+    
+    // Handle enter key press
+    assetInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        downloadBtn.click();
+      }
+    });
+    
+    cookieInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        saveCookieBtn.click();
+      }
+    });
+    
+    // Debug panel functionality
+    const debugLogsEl = document.getElementById('debugLogs');
+    const refreshLogsBtn = document.getElementById('refreshLogsBtn');
+    const clearLogsBtn = document.getElementById('clearLogsBtn');
+    const logFilters = document.querySelectorAll('.log-filter');
+    const authDebugOutput = document.getElementById('auth-debug-output');
+    
+    // Set up listener for auth notifications
+    window.addEventListener('auth-notification', (event) => {
+      const data = event.detail;
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.innerHTML = `[${time}] <strong>${data.message}</strong>`;
+      
+      if (data.userData) {
+        entry.innerHTML += `<br><small>${data.userData}</small>`;
+      }
+      
+      // Prepend to show most recent first
+      authDebugOutput.insertBefore(entry, authDebugOutput.firstChild);
+      
+      // Show debug tab if we get an error
+      if (data.message.includes('error')) {
+        // Switch to debug tab
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        const debugTab = document.querySelector('.tab[data-tab="debug"]');
+        debugTab.classList.add('active');
+        document.getElementById('debug-tab').classList.add('active');
+      }
+    });
+    
+    // Set up listener for debug logs from main process
+    window.addEventListener('debug-log', (event) => {
+      const log = event.detail;
+      appendLogToUI(log);
+    });
+    
+    // Function to format a log entry for display
+    function formatLogEntry(log) {
+      const time = new Date(log.timestamp).toLocaleTimeString();
+      let content = `[${time}] ${log.type}: `;
+      
+      try {
+        // For API request/response logs, format the data nicely
+        if (log.type.includes('API_REQUEST')) {
+          content += `${log.data.method} ${log.data.url}\n`;
+          if (log.data.headers) {
+            content += `Headers: ${JSON.stringify(log.data.headers, null, 2)}\n`;
+          }
+        } 
+        else if (log.type.includes('API_RESPONSE')) {
+          content += `${log.data.status} ${log.data.statusText} - ${log.data.url}\n`;
+          if (log.data.data) {
+            const responseData = typeof log.data.data === 'string' 
+              ? log.data.data 
+              : JSON.stringify(log.data.data, null, 2);
+            content += `Response: ${responseData}\n`;
+          }
+        }
+        else if (log.type.includes('API_ERROR')) {
+          content += `Error: ${log.data.status || ''} ${log.data.error || ''} - ${log.data.url}\n`;
+          if (log.data.data) {
+            content += `Details: ${JSON.stringify(log.data.data, null, 2)}\n`;
+          }
+        }
+        else if (log.type.includes('FILE_DOWNLOAD')) {
+          content += `Asset ID: ${log.data.assetId}\n`;
+          if (log.data.fileName) {
+            content += `File: ${log.data.fileName}\n`;
+          }
+          if (log.data.contentType) {
+            content += `Type: ${log.data.contentType}\n`;
+          }
+        }
+        else {
+          // Default formatting for other log types
+          content += JSON.stringify(log.data, null, 2);
+        }
+      } catch (e) {
+        content += `[Error formatting log: ${e.message}]`;
+      }
+      
+      return content;
+    }
+    
+    // Function to append a log entry to the UI
+    function appendLogToUI(log) {
+      // Check if this log type is currently filtered out
+      const shouldShow = Array.from(logFilters).some(filter => 
+        filter.checked && log.type.includes(filter.value)
+      );
+      
+      if (!shouldShow) return;
+      
+      const formattedLog = formatLogEntry(log);
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry ${log.type.toLowerCase()}`;
+      logEntry.textContent = formattedLog;
+      
+      // Color-code different log types
+      if (log.type.includes('ERROR')) {
+        logEntry.style.color = '#dc3545';
+      } else if (log.type.includes('RESPONSE')) {
+        logEntry.style.color = '#28a745';
+      } else if (log.type.includes('FILE_DOWNLOAD')) {
+        logEntry.style.color = '#6610f2';
+      }
+      
+      debugLogsEl.prepend(logEntry);
+    }
+    
+    // Function to load and display all debug logs
+    async function loadDebugLogs() {
+      try {
+        debugLogsEl.innerHTML = 'Loading logs...';
+        const result = await window.api.debugLogs();
+        
+        if (result && result.logs && result.logs.length > 0) {
+          debugLogsEl.innerHTML = '';
+          
+          // Display logs newest to oldest
+          result.logs.forEach(log => {
+            appendLogToUI(log);
+          });
+        } else {
+          debugLogsEl.textContent = 'No logs available.';
+        }
+      } catch (error) {
+        debugLogsEl.textContent = `Error loading logs: ${error.message}`;
+      }
+    }
+    
+    // Set up log filter change event
+    logFilters.forEach(filter => {
+      filter.addEventListener('change', loadDebugLogs);
+    });
+    
+    // Set up refresh button
+    refreshLogsBtn.addEventListener('click', loadDebugLogs);
+    
+    // Set up clear logs button
+    clearLogsBtn.addEventListener('click', () => {
+      debugLogsEl.innerHTML = 'Logs cleared.';
+    });
+    
+    // Load logs when debug tab is selected
+    tabs.forEach(tab => {
+      if (tab.dataset.tab === 'debug') {
+        tab.addEventListener('click', loadDebugLogs);
+      }
+    });
+    
+    // Show loading overlay initially
+    document.addEventListener('DOMContentLoaded', () => {
+      // Make sure the overlay is visible on page load
+      loadingOverlay.style.display = 'flex';
+      loadingOverlay.classList.remove('hidden');
+      
+      // Set initial message
+      const messageElement = loadingOverlay.querySelector('.loading-message');
+      if (messageElement) messageElement.textContent = 'Starting Application';
+      loadingStatus.textContent = 'Please wait...';
+      
+      // No need to call checkAuthStatus here - it will be called by the load event
+    });
+    
+    // Close preview button
+    closePreviewBtn.addEventListener('click', () => {
+      imagePreviewContainer.style.display = 'none';
+      statusEl.style.display = 'none';
+    });
+    
+    // Show toast notification
+    function showToast(message, type = 'info') {
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      // Create icon based on type
+      let icon = '&#x1F6C8;'; // info icon
+      if (type === 'success') {
+        icon = '&#x2714;'; // checkmark
+      } else if (type === 'error') {
+        icon = '&#x26A0;'; // warning
+      }
+      
+      // Set toast content
+      toast.innerHTML = `
+        <div class="toast-icon">${icon}</div>
+        <div class="toast-content">
+          <p class="toast-message">${message}</p>
+        </div>
+      `;
+      
+      // Add to container
+      toastContainer.appendChild(toast);
+      
+      // Remove after animation completes (3 seconds)
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+  </script>
+</body>
+</html> 
