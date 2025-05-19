@@ -60,8 +60,12 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
-    }
+    },
+    icon: path.join(__dirname, 'build/icon.png')
   });
+
+  // Remove the menu bar
+  mainWindow.setMenu(null);
 
   // Load the index.html file
   mainWindow.loadFile('index.html');

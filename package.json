@@ -1,6 +1,6 @@
 {
-  "name": "rbxdl-local",
-  "version": "1.0.0",
+  "name": "rbxdl",
+  "version": "0.1.0",
   "description": "Local Roblox Asset Downloader",
   "main": "main.js",
   "scripts": {
@@ -18,16 +18,15 @@
   },
   "devDependencies": {
     "electron": "^30.0.0",
-    "electron-builder": "^24.9.1"
+    "electron-builder": "^24.9.1",
+    "electron-icon-maker": "^0.0.5"
   },
   "build": {
-    "appId": "com.example.rbxdl-local",
+    "appId": "com.example.rbxdl",
     "productName": "Roblox Asset Downloader",
+    "executableName": "rbxdl",
     "directories": {
       "output": "dist"
-    },
-    "win": {
-      "target": "nsis"
     }
   }
 }

@@ -7,6 +7,7 @@ yarn-error.log
 # Electron build
 dist/
 out/
+dev/
 
 # OS specific
 .DS_Store
