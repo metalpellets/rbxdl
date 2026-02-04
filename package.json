@@ -1,11 +1,13 @@
 {
   "name": "rbxdl",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local Roblox Asset Downloader",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:portable": "electron-builder --win portable"
   },
   "author": "",
   "license": "MIT",
@@ -13,20 +15,40 @@
     "axios": "^1.8.4",
     "electron-store": "^8.1.0",
     "form-data": "^4.0.0",
-    "noblox.js": "^6.1.1",
+    "noblox.js": "^6.2.0",
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "electron": "^30.0.0",
-    "electron-builder": "^24.9.1",
+    "electron": "^40.1.0",
+    "electron-builder": "^26.7.0",
     "electron-icon-maker": "^0.0.5"
   },
   "build": {
-    "appId": "com.example.rbxdl",
+    "appId": "com.rbxdl.app",
     "productName": "Roblox Asset Downloader",
     "executableName": "rbxdl",
     "directories": {
       "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "build/icon.png",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     }
   }
 }

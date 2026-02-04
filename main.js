@@ -25,6 +25,101 @@ let mainWindow;
 let robloxCookie = null;
 let debugLogs = [];
 
+// Regex to detect outdated cookie formats (will be deprecated after May 1, 2026)
+const OUTDATED_COOKIE_REGEX = /^(_\|WARNING:-DO-NOT-SHARE-THIS\.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items\.\|_)(GgIQAQ\.)?([0-9A-F]+)$/;
+
+/**
+ * Checks if a cookie is in the outdated format that will be deprecated
+ * @param {string} cookie - The cookie value to check
+ * @returns {boolean} - True if the cookie is in an outdated format
+ */
+function isOutdatedCookieFormat(cookie) {
+  if (!cookie) return false;
+  return OUTDATED_COOKIE_REGEX.test(cookie);
+}
+
+/**
+ * Parses Set-Cookie header to extract .ROBLOSECURITY cookie value
+ * @param {string|string[]} setCookieHeader - The Set-Cookie header value(s)
+ * @returns {string|null} - The new cookie value or null if not found
+ */
+function parseRoblosecurityFromSetCookie(setCookieHeader) {
+  if (!setCookieHeader) return null;
+  
+  // Handle both single string and array of cookies
+  const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
+  
+  for (const cookieStr of cookies) {
+    // Look for .ROBLOSECURITY cookie
+    if (cookieStr.startsWith('.ROBLOSECURITY=')) {
+      // Extract the value (everything between = and the first ;)
+      const match = cookieStr.match(/^\.ROBLOSECURITY=([^;]+)/);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Updates the stored cookie if a new one is provided via Set-Cookie header
+ * @param {Object} responseHeaders - The response headers from an API call
+ * @returns {Promise<boolean>} - True if cookie was updated
+ */
+async function handleCookieUpdate(responseHeaders) {
+  if (!responseHeaders) return false;
+  
+  // Check for Set-Cookie header (axios lowercases header names)
+  const setCookieHeader = responseHeaders['set-cookie'];
+  if (!setCookieHeader) return false;
+  
+  const newCookie = parseRoblosecurityFromSetCookie(setCookieHeader);
+  if (!newCookie) return false;
+  
+  // Don't update if it's the same cookie
+  if (newCookie === robloxCookie) return false;
+  
+  console.log('Received new .ROBLOSECURITY cookie via Set-Cookie header, updating...');
+  
+  addDebugLog('COOKIE_UPDATE', {
+    message: 'Received updated .ROBLOSECURITY cookie from Roblox',
+    oldCookiePreview: robloxCookie ? `${robloxCookie.substring(0, 20)}...` : 'none',
+    newCookiePreview: `${newCookie.substring(0, 20)}...`,
+    isNewFormatOutdated: isOutdatedCookieFormat(newCookie)
+  });
+  
+  try {
+    // Update the cookie in noblox.js
+    await noblox.setCookie(newCookie);
+    
+    // Update in-memory cookie
+    robloxCookie = newCookie;
+    
+    // Persist to secure store
+    store.set('robloxCookie', newCookie);
+    
+    console.log('Cookie updated successfully');
+    
+    // Notify the renderer process about the cookie update
+    if (mainWindow) {
+      mainWindow.webContents.send('cookie-updated', {
+        message: 'Your authentication cookie was automatically updated by Roblox',
+        isOutdated: isOutdatedCookieFormat(newCookie)
+      });
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating cookie from Set-Cookie header:', error);
+    addDebugLog('COOKIE_UPDATE_ERROR', {
+      error: error.message
+    });
+    return false;
+  }
+}
+
 // Helper function to add debug logs
 function addDebugLog(type, data) {
   const log = {
@@ -148,6 +243,16 @@ async function setCookie(cookie) {
     
     console.log('Attempting to set cookie...');
     
+    // Check if the cookie is in the outdated format
+    const isOutdated = isOutdatedCookieFormat(cookie);
+    if (isOutdated) {
+      console.log('Warning: Cookie is in outdated format that will be deprecated after May 1, 2026');
+      addDebugLog('COOKIE_FORMAT_WARNING', {
+        message: 'Cookie is in outdated format - will be deprecated after May 1, 2026',
+        recommendation: 'The app will automatically update your cookie when Roblox sends a new one via Set-Cookie header'
+      });
+    }
+    
     // Format the cookie properly for noblox.js
     robloxCookie = cookie;
     let formattedCookie = cookie;
@@ -192,7 +297,11 @@ async function setCookie(cookie) {
       success: true, 
       authenticated: true,
       username: currentUser.name,
-      userId: currentUser.UserID || currentUser.id
+      userId: currentUser.UserID || currentUser.id,
+      isOutdatedFormat: isOutdated,
+      cookieFormatWarning: isOutdated 
+        ? 'Your cookie is in an outdated format that will be deprecated after May 1, 2026. The app will automatically update it when Roblox sends a new one.'
+        : null
     };
   } catch (error) {
     console.error('Authentication error details:', error);
@@ -265,6 +374,9 @@ async function generalGetRequest(url) {
     // Make the GET request
     const response = await axios.get(url, { headers });
     console.log(`Response status: ${response.status}`);
+    
+    // Check for and handle cookie updates from Roblox
+    await handleCookieUpdate(response.headers);
     
     // Log the successful response
     addDebugLog('API_RESPONSE', {
@@ -454,6 +566,9 @@ async function downloadAsset(assetId) {
         responseType: 'arraybuffer',
         headers: headers
       });
+      
+      // Check for and handle cookie updates from Roblox
+      await handleCookieUpdate(fileResponse.headers);
       
       // Log successful download
       addDebugLog('FILE_DOWNLOAD_SUCCESS', {
@@ -647,16 +762,25 @@ ipcMain.handle('get-auth-status', async () => {
     }
     
     console.log('Auth status check successful for user:', currentUser.name);
+    
+    // Check if the current cookie is in an outdated format
+    const isOutdated = isOutdatedCookieFormat(robloxCookie);
+    
     if (mainWindow) {
       mainWindow.webContents.send('auth-notification', { 
-        message: `Auth check successful for user: ${currentUser.name}` 
+        message: `Auth check successful for user: ${currentUser.name}`,
+        isOutdatedFormat: isOutdated
       });
     }
     
     return { 
       authenticated: true,
       username: currentUser.name,
-      userId: currentUser.UserID || currentUser.id
+      userId: currentUser.UserID || currentUser.id,
+      isOutdatedFormat: isOutdated,
+      cookieFormatWarning: isOutdated 
+        ? 'Your cookie is in an outdated format that will be deprecated after May 1, 2026. The app will automatically update it when Roblox sends a new one.'
+        : null
     };
   } catch (error) {
     console.error('Auth status check error:', error.message);
@@ -675,5 +799,21 @@ ipcMain.handle('get-auth-status', async () => {
 ipcMain.handle('debug-logs', async () => {
   return {
     logs: debugLogs
+  };
+});
+
+// Handler to check cookie format status
+ipcMain.handle('check-cookie-format', async () => {
+  if (!robloxCookie) {
+    return { hasCookie: false };
+  }
+  
+  const isOutdated = isOutdatedCookieFormat(robloxCookie);
+  return {
+    hasCookie: true,
+    isOutdatedFormat: isOutdated,
+    warning: isOutdated 
+      ? 'Your cookie is in an outdated format that will be deprecated after May 1, 2026. Continue using the app normally - it will automatically update your cookie when Roblox sends a new one via the Set-Cookie header.'
+      : null
   };
 }); 

@@ -19,7 +19,8 @@ contextBridge.exposeInMainWorld(
     },
     saveImage: (data) => ipcRenderer.invoke('save-image', data),
     copyImageToClipboard: (imageData) => ipcRenderer.invoke('copy-image-to-clipboard', imageData),
-    debugLogs: () => ipcRenderer.invoke('debug-logs')
+    debugLogs: () => ipcRenderer.invoke('debug-logs'),
+    checkCookieFormat: () => ipcRenderer.invoke('check-cookie-format')
   }
 ); 
 
@@ -34,6 +35,13 @@ ipcRenderer.on('auth-notification', (event, data) => {
   console.log('Auth notification received:', data);
   const authEvent = new CustomEvent('auth-notification', { detail: data });
   window.dispatchEvent(authEvent);
+});
+
+// Set up listener for cookie update notifications (when Roblox sends Set-Cookie)
+ipcRenderer.on('cookie-updated', (event, data) => {
+  console.log('Cookie update notification received:', data);
+  const cookieEvent = new CustomEvent('cookie-updated', { detail: data });
+  window.dispatchEvent(cookieEvent);
 });
 
 // Log when preload script has loaded

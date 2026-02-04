@@ -202,7 +202,7 @@
     
         /* Pop-up notification styles */    .toast-container {      position: fixed;      bottom: 20px;      right: 20px;      z-index: 9999;      display: flex;      flex-direction: column;      gap: 8px;      max-width: 380px;    }        .toast {      background-color: var(--card);      color: var(--card-foreground);      padding: 12px 16px;      border-radius: var(--radius);      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);      display: flex;      align-items: center;      animation: slideUp 0.2s ease, fadeOut 0.2s 3s forwards;      overflow: hidden;      border: 1px solid var(--border);    }        .toast.success {      border-left: 3px solid #10b981;    }        .toast.error {      border-left: 3px solid #ef4444;    }        .toast.info {      border-left: 3px solid #3b82f6;    }        .toast-icon {      margin-right: 12px;      font-size: 16px;      display: flex;      align-items: center;      justify-content: center;    }        .toast-content {      flex: 1;    }        .toast-message {      margin: 0;      font-size: 0.875rem;    }        @keyframes slideUp {      from { transform: translateY(20px); opacity: 0; }      to { transform: translateY(0); opacity: 1; }    }        @keyframes fadeOut {      from { opacity: 1; }      to { opacity: 0; }    }
     
-        /* Debug panel styling */    .button-group {      display: flex;      gap: 0.5rem;      margin-bottom: 1rem;    }        .button-icon {      margin-right: 0.5rem;    }        button svg {      display: inline-block;      vertical-align: middle;    }        .debug-filters {      display: flex;      flex-wrap: wrap;      gap: 0.75rem;      margin-bottom: 1rem;    }        .debug-filters label {      display: flex;      align-items: center;      gap: 0.5rem;      font-size: 0.875rem;      color: var(--muted-foreground);      cursor: pointer;      user-select: none;    }        .debug-filters input[type="checkbox"] {      width: 16px;      height: 16px;      flex: none;      accent-color: var(--foreground);    }        .auth-debug {      margin-bottom: 1rem;      padding: 0.75rem;      background-color: var(--muted);      border: 1px solid var(--border);      border-radius: var(--radius);    }        .auth-debug h3 {      margin-bottom: 0.5rem;      font-size: 0.875rem;      font-weight: 600;    }        #auth-debug-output {      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;      font-size: 0.75rem;      white-space: pre-wrap;      color: var(--muted-foreground);    }        .debug-log-container {      max-height: 400px;      overflow-y: auto;      background-color: var(--muted);      border: 1px solid var(--border);      border-radius: var(--radius);      padding: 1rem;    }        #debugLogs {      margin: 0;      white-space: pre-wrap;      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;      font-size: 0.75rem;      line-height: 1.5;      color: var(--muted-foreground);    }        .log-entry {      margin-bottom: 0.5rem;      padding-bottom: 0.5rem;      border-bottom: 1px solid var(--border);    }
+        /* Cookie format warning banner */    .cookie-format-warning {      background-color: #fef3c7;      border: 1px solid #f59e0b;      border-radius: var(--radius);      padding: 1rem;      margin-bottom: 1rem;    }        .cookie-format-warning strong {      color: #92400e;      display: block;      margin-bottom: 0.5rem;    }        .cookie-format-warning p {      color: #78350f;      margin-bottom: 0.5rem;      font-size: 0.875rem;    }        .cookie-format-warning p:last-child {      margin-bottom: 0;    }        /* Debug panel styling */    .button-group {      display: flex;      gap: 0.5rem;      margin-bottom: 1rem;    }        .button-icon {      margin-right: 0.5rem;    }        button svg {      display: inline-block;      vertical-align: middle;    }        .debug-filters {      display: flex;      flex-wrap: wrap;      gap: 0.75rem;      margin-bottom: 1rem;    }        .debug-filters label {      display: flex;      align-items: center;      gap: 0.5rem;      font-size: 0.875rem;      color: var(--muted-foreground);      cursor: pointer;      user-select: none;    }        .debug-filters input[type="checkbox"] {      width: 16px;      height: 16px;      flex: none;      accent-color: var(--foreground);    }        .auth-debug {      margin-bottom: 1rem;      padding: 0.75rem;      background-color: var(--muted);      border: 1px solid var(--border);      border-radius: var(--radius);    }        .auth-debug h3 {      margin-bottom: 0.5rem;      font-size: 0.875rem;      font-weight: 600;    }        #auth-debug-output {      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;      font-size: 0.75rem;      white-space: pre-wrap;      color: var(--muted-foreground);    }        .debug-log-container {      max-height: 400px;      overflow-y: auto;      background-color: var(--muted);      border: 1px solid var(--border);      border-radius: var(--radius);      padding: 1rem;    }        #debugLogs {      margin: 0;      white-space: pre-wrap;      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;      font-size: 0.75rem;      line-height: 1.5;      color: var(--muted-foreground);    }        .log-entry {      margin-bottom: 0.5rem;      padding-bottom: 0.5rem;      border-bottom: 1px solid var(--border);    }
   </style>
 </head>
 <body>
@@ -253,6 +253,12 @@
     <div class="form-container tab-content" id="auth-tab">
       <h2>Authentication</h2>
       <p>Set your Roblox cookie to download assets that require authentication.</p>
+      
+      <div id="cookieFormatWarning" class="cookie-format-warning" style="display: none;">
+        <strong>Cookie Format Notice</strong>
+        <p>Your current cookie is in an outdated format that Roblox will deprecate after <strong>May 1, 2026</strong>.</p>
+        <p>Don't worry - this app will automatically update your cookie when Roblox sends a new one. Just continue using the app normally.</p>
+      </div>
       
       <div class="input-group">
         <input type="text" id="cookieInput" class="cookie-input" placeholder="Enter your .ROBLOSECURITY cookie here">
@@ -306,6 +312,7 @@
     const saveImageBtn = document.getElementById('saveImageBtn');
     const closePreviewBtn = document.getElementById('closePreviewBtn');
     const toastContainer = document.getElementById('toastContainer');
+    const cookieFormatWarning = document.getElementById('cookieFormatWarning');
     
     // Current image data
     let currentImageData = null;
@@ -359,9 +366,27 @@
         if (result.authenticated) {
           statusDot.classList.remove('unauthenticated');
           statusDot.classList.add('authenticated');
-          authStatusText.textContent = `Authenticated as ${result.username}`;
-          loadingStatus.textContent = `Authenticated as ${result.username}`;
+          
+          let statusText = `Authenticated as ${result.username}`;
+          if (result.isOutdatedFormat) {
+            statusText += ' (cookie format outdated)';
+          }
+          
+          authStatusText.textContent = statusText;
+          loadingStatus.textContent = statusText;
+          
+          // Show/hide warning banner based on cookie format
+          if (result.isOutdatedFormat) {
+            cookieFormatWarning.style.display = 'block';
+            setTimeout(() => {
+              showToast('Your cookie format will be deprecated after May 1, 2026. See Authentication tab for details.', 'info');
+            }, 500);
+          } else {
+            cookieFormatWarning.style.display = 'none';
+          }
         } else {
+          // Hide warning when not authenticated
+          cookieFormatWarning.style.display = 'none';
           statusDot.classList.remove('authenticated');
           statusDot.classList.add('unauthenticated');
           authStatusText.textContent = 'Not authenticated';
@@ -418,6 +443,15 @@
       }, 300);
     }
     
+    // Regex to detect outdated cookie formats (will be deprecated after May 1, 2026)
+    const OUTDATED_COOKIE_REGEX = /^(_\|WARNING:-DO-NOT-SHARE-THIS\.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items\.\|_)(GgIQAQ\.)?([0-9A-F]+)$/;
+    
+    // Function to check if cookie is in outdated format
+    function isOutdatedCookieFormat(cookie) {
+      if (!cookie) return false;
+      return OUTDATED_COOKIE_REGEX.test(cookie);
+    }
+    
     // Function to clean and format cookie
     function formatCookie(rawCookie) {
       // Trim whitespace
@@ -452,9 +486,9 @@
       // Format and clean the cookie
       cookie = formatCookie(cookie);
       
-      // Check if cookie starts with the expected warning text
-      if (!cookie.startsWith('_|WARNING:-DO-NOT-SHARE-THIS')) {
-        showCookieStatus('Cookie appears to be invalid. Make sure you\'re copying the entire value starting with "_|WARNING:-DO-NOT-SHARE-THIS..."', 'error');
+      // Basic validation - cookie should be reasonably long
+      if (cookie.length < 100) {
+        showCookieStatus('Cookie appears to be too short. Make sure you\'re copying the entire .ROBLOSECURITY value.', 'error');
         return;
       }
       
@@ -464,7 +498,17 @@
         const result = await window.api.setCookie(cookie);
         
         if (result.success && result.authenticated) {
-          showCookieStatus(`Successfully authenticated as ${result.username}`, 'success');
+          let statusMsg = `Successfully authenticated as ${result.username}`;
+          
+          // Show warning if cookie is in outdated format
+          if (result.isOutdatedFormat) {
+            statusMsg += '\n\nNote: Your cookie is in an outdated format that will be deprecated after May 1, 2026. The app will automatically update it when Roblox sends a new one.';
+            showCookieStatus(statusMsg, 'info');
+            showToast('Cookie format will be deprecated soon - see Authentication tab for details', 'info');
+          } else {
+            showCookieStatus(statusMsg, 'success');
+          }
+          
           // Update authentication status display
           await checkAuthStatus();
         } else {
@@ -745,6 +789,10 @@
         entry.innerHTML += `<br><small>${data.userData}</small>`;
       }
       
+      if (data.isOutdatedFormat) {
+        entry.innerHTML += `<br><small style="color: #f59e0b;">Cookie format is outdated (will be deprecated May 1, 2026)</small>`;
+      }
+      
       // Prepend to show most recent first
       authDebugOutput.insertBefore(entry, authDebugOutput.firstChild);
       
@@ -758,6 +806,24 @@
         debugTab.classList.add('active');
         document.getElementById('debug-tab').classList.add('active');
       }
+    });
+    
+    // Set up listener for cookie update notifications (when Roblox sends Set-Cookie)
+    window.addEventListener('cookie-updated', (event) => {
+      const data = event.detail;
+      console.log('Cookie updated by Roblox:', data);
+      
+      // Show a success toast
+      showToast(data.message || 'Your authentication cookie was automatically updated by Roblox', 'success');
+      
+      // Log to debug panel
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.innerHTML = `[${time}] <strong style="color: #10b981;">Cookie Auto-Updated</strong><br><small>${data.message}</small>`;
+      authDebugOutput.insertBefore(entry, authDebugOutput.firstChild);
+      
+      // Refresh auth status to update UI
+      checkAuthStatus();
     });
     
     // Set up listener for debug logs from main process
