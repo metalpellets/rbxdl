@@ -34,7 +34,7 @@
       "main.js",
       "preload.js",
       "index.html",
-      "build/icon.png",
+      "assets/icon.png",
       "node_modules/**/*"
     ],
     "win": {
@@ -42,7 +42,7 @@
         "nsis",
         "portable"
       ],
-      "icon": "build/icon.png"
+      "icon": "assets/icon.png"
     },
     "nsis": {
       "oneClick": false,
