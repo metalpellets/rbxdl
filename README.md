@@ -25,33 +25,26 @@ A desktop application that allows you to download Roblox assets directly to your
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### Download
 
-- [Node.js](https://nodejs.org/) v14 or newer
-- npm (included with Node.js)
+Download the latest executable from the [Releases](https://github.com/metalpellets/rbxdl/releases) page.
 
-### Installation
+### Building from Source
+
+If you want to build from source:
 
 ```bash
 # Clone the repository
-git clone https://github.com/valbofs/rbxdl.git
+git clone https://github.com/metalpellets/rbxdl.git
 cd rbxdl
 
 # Install dependencies
 npm install
-```
 
-### Running the App
-
-```bash
-# Start in development mode
+# Run in development mode
 npm start
-```
 
-### Building for Distribution
-
-```bash
-# Create an executable for your current OS
+# Or build an executable
 npm run build
 ```
 
@@ -63,9 +56,9 @@ The compiled application will be available in the `dist` folder.
 
 1. Launch the application
 2. Enter a Roblox Asset ID or URL in the input field:
-   - Asset ID: `1818`
-   - Catalog URL: `https://www.roblox.com/catalog/1818/...`
-   - Library URL: `https://www.roblox.com/library/1818/...`
+   - Asset ID: `109251560`
+   - Catalog URL: `https://www.roblox.com/catalog/109251560/...`
+   - Library URL: `https://www.roblox.com/library/109251560/...`
 3. Click "Download"
 4. For non-image assets, select where to save the file
 5. For images, a preview will appear allowing you to:
@@ -88,34 +81,10 @@ Some Roblox assets require authentication to download. To use your Roblox accoun
 
 ## 🔒 Security Notes
 
-- Your Roblox cookie is encrypted and stored locally using electron-store
+- Your Roblox cookie is encrypted and stored locally
 - No authentication data is transmitted to third-party servers
 - All downloads happen directly between your computer and Roblox's servers
 - The application never shares your credentials
-
-## ⚙️ Technical Details
-
-This application is built with:
-- [Electron](https://www.electronjs.org/) for the desktop framework
-- [noblox.js](https://github.com/noblox/noblox.js) for Roblox API authentication
-- [axios](https://axios-http.com/) for HTTP requests
-- [electron-store](https://github.com/sindresorhus/electron-store) for secure data storage
-
-The app communicates directly with Roblox's asset delivery APIs, including:
-- Asset information API
-- Asset delivery service
-- Economy API for asset details
-- Toolbox API for decal/image extraction
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## ⚠️ Disclaimer
 
